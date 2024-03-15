@@ -1,7 +1,7 @@
 # Rasmus
 
 **Group members:**
-- Rasmus Harsányi (rj144)
+- Rasmus Harsányi (rjb144)
 
 This repository contains  
 1. Inaugural project. 
