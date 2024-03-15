@@ -1,9 +1,7 @@
-# \[Group name\]
+# Rasmus
 
 **Group members:**
-- A
-- B
-- C
+- Rasmus Harsányi (rj144)
 
 This repository contains  
 1. Inaugural project. 
