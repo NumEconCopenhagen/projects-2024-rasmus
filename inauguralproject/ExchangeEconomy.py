@@ -149,3 +149,27 @@ class ExchangeEconomyClass:
             return optimal_allocation_A, optimal_allocation_B, self.utility_A(*optimal_allocation_A) + self.utility_B(*optimal_allocation_B)
         else:
             raise ValueError("Optimization failed to maximize aggregate utility.")
+    def maximize_total_utility(self):
+        """Maximize the total utility of consumers A and B."""
+        # Define the objective function for total utility
+        def objective(x):
+            # Calculate B's consumption based on A's consumption
+            x1B, x2B = 1 - x[0], 1 - x[1]
+            # Total utility is the sum of A's and B's utilities
+            return -(self.utility_A(x[0], x[1]) + self.utility_B(x1B, x2B))
+
+        # Initial guess for A's allocation could be their initial endowments
+        x0 = [self.par.w1A, self.par.w2A]
+
+        # Bounds to ensure allocations are within the feasible range
+        bounds = ((0, 1), (0, 1))
+
+        # Perform the optimization to maximize total utility
+        result = minimize(objective, x0, method='SLSQP', bounds=bounds)
+
+        if result.success:
+            optimal_allocation_A = result.x
+            optimal_allocation_B = 1 - result.x
+            return optimal_allocation_A, optimal_allocation_B, self.utility_A(*optimal_allocation_A) + self.utility_B(*optimal_allocation_B)
+        else:
+            raise ValueError("Optimization failed to maximize total utility.")
