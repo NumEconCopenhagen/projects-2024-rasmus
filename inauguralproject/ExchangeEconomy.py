@@ -68,3 +68,84 @@ class ExchangeEconomyClass:
             return optimal_price, optimal_allocation_A, -result.fun
         else:
             raise ValueError("Optimization failed to maximize consumer A's utility.")
+            
+    def optimize_allocation_pareto_improvement(self):
+        """Optimize allocation to maximize A's utility with Pareto improvement constraints."""
+        def objective(x):
+            # Negative utility for A because we minimize in scipy.optimize
+            return -self.utility_A(x[0], x[1])
+    
+        # Constraints to ensure both A and B are at least as well off as their initial endowments
+        constraints = [
+            {'type': 'ineq', 'fun': lambda x: self.utility_A(x[0], x[1]) - self.utility_A(self.par.w1A, self.par.w2A)},
+            {'type': 'ineq', 'fun': lambda x: self.utility_B(1 - x[0], 1 - x[1]) - self.utility_B(1 - self.par.w1A, 1 - self.par.w2A)}
+        ]
+    
+        # Bounds to ensure allocations are within feasible range
+        bounds = ((0, 1), (0, 1))
+    
+        # Initial guess (starting point of the optimization algorithm)
+        x0 = [self.par.w1A, self.par.w2A]
+    
+        # Perform the optimization
+        result = minimize(objective, x0, method='SLSQP', bounds=bounds, constraints=constraints)
+    
+        if result.success:
+            return result.x, -result.fun
+        else:
+            raise ValueError("Optimization failed.")
+    def maximize_utility_unrestricted(self):
+        """Utility maximization for Consumer A without restrictions other than B's initial utility."""
+        # Objective function: Negative of A's utility to turn the maximization problem into a minimization problem
+        def objective(x):
+            return -self.utility_A(x[0], x[1])
+
+        # Constraint for B's utility to be at least as high as the initial utility
+        def constraint(x):
+            return self.utility_B(1 - x[0], 1 - x[1]) - self.utility_B(1 - self.par.w1A, 1 - self.par.w2A)
+
+        # Initial guess for the allocation
+        x0 = [self.par.w1A, self.par.w2A]
+
+        # Bounds for the allocations
+        bounds = ((0, 1), (0, 1))
+
+        # Constraint dictionary
+        cons = {'type': 'ineq', 'fun': constraint}
+
+        # Solve the optimization problem
+        result = minimize(objective, x0, method='SLSQP', bounds=bounds, constraints=cons)
+
+        if result.success:
+            optimal_allocation = result.x
+            print(f"The optimal allocation for A is: ({optimal_allocation[0]:.4f}, {optimal_allocation[1]:.4f})")
+            print(f"The optimal allocation for B is: ({1-optimal_allocation[0]:.4f}, {1-optimal_allocation[1]:.4f})")
+            print(f"A's utility: {self.utility_A(optimal_allocation[0], optimal_allocation[1]):.4f}")
+            print(f"B's utility: {self.utility_B(1-optimal_allocation[0], 1-optimal_allocation[1]):.4f}")
+            print(f"Total utility: {self.utility_A(optimal_allocation[0], optimal_allocation[1]) + self.utility_B(1-optimal_allocation[0], 1-optimal_allocation[1]):.4f}")
+        else:
+            print("Optimization was not successful.")
+    def maximize_aggregate_utility(self):
+        """Maximize the aggregate utility of consumers A and B."""
+        # Define the objective function for aggregate utility
+        def objective(x):
+            # Calculate B's consumption based on A's consumption
+            x1B, x2B = 1 - x[0], 1 - x[1]
+            # Aggregate utility is the sum of A's and B's utilities
+            return -(self.utility_A(x[0], x[1]) + self.utility_B(x1B, x2B))
+
+        # Initial guess for A's allocation could be their initial endowments
+        x0 = [self.par.w1A, self.par.w2A]
+
+        # Bounds to ensure allocations are within the feasible range
+        bounds = ((0, 1), (0, 1))
+
+        # Perform the optimization to maximize aggregate utility
+        result = minimize(objective, x0, method='SLSQP', bounds=bounds)
+
+        if result.success:
+            optimal_allocation_A = result.x
+            optimal_allocation_B = 1 - result.x
+            return optimal_allocation_A, optimal_allocation_B, self.utility_A(*optimal_allocation_A) + self.utility_B(*optimal_allocation_B)
+        else:
+            raise ValueError("Optimization failed to maximize aggregate utility.")
