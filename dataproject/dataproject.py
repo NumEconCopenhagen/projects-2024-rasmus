@@ -1,18 +1,26 @@
-def variance(omega, alpha,epislon beta, variance):
-    omega = 10**-3
-    beta = 0.88
-    alpha = 0.1
-    lambda_ = 1.86 * 10**-3
-    inital_variance = 0.5
-    variance = inital_variance
-    z =
-    for i in range(100):
-        variance = omega + alpha * z + beta * variance**2 + lambda_
+import numpy as np
+import pandas as pd
+from scipy.stats import norm
+import yfinance as yf
+N = norm.pdf
 
+class DataProject:
+    def get_stock_data(self, ticker, start_date, end_date=None):
+        """
+        Fetches historical stock data from Yahoo Finance.
 
+        Parameters:
+        ticker (str): The ticker symbol of the stock.
+        start_date (str): The start date for the data in the format 'YYYY-MM-DD'.
+        end_date (str, optional): The end date for the data in the format 'YYYY-MM-DD'. If not provided, fetches data up to the present.
 
+        Returns:
+        pandas.DataFrame: A DataFrame with the historical stock data.
+        """
+        # Get the stock data
+        stock = yf.Ticker(ticker)
 
-    - Alpha ($\alpha$): $0.1$
-- Beta ($\beta$): $0.88$
-- Omega ($\omega$): $2 \times 10^{-3}$
-- Lambda ($\lambda$): $1.86 \times 10^{-3}$
+        # Get the historical stock prices for the specified period
+        data = stock.history(start=start_date, end=end_date)
+
+        return data
