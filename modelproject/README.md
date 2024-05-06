@@ -1,6 +1,6 @@
 # Model analysis project
 
-Our project is titled **Numerical analysis of the Principal-Agent model** and is about solving the principal-agent problem numerical.
+Our project is titled **Numerical analysis of 1st degree price discrimination** and is about solving the monopolist problem numerical.
 
 The **results** of the project can be seen from running [modelproject.ipynb](modelproject.ipynb).
 
